@@ -43,10 +43,37 @@ fun main() {
 
 //Daemon поток - поток, который работает в фоновом режиме, отличается от обычного потока, тем, что он не блокирует завершение программы. Если все обычные потоки (недемонные) завершили свою работу, JVM завершит работу и daemon-потоки.
 
+//Executor Services
+
+//FixedThreadPool (Пул с фиксированным количеством потоков)
+val executor = Executors.newFixedThreadPool(4) // Пул из 4 потоков
+executor.submit { println("Task 1") }
+executor.submit { println("Task 2") }
+executor.shutdown()
+
+//CachedThreadPool (Кэшированный пул потоков), потоки создаются по мере необходимости, но не более чем определенное количество потоков.
+//Этот пул подходит для обработки большого количества коротких задач, где важно не терять время на ожидание свободных потоков.
+val executor = Executors.newCachedThreadPool()
+executor.submit { println("Task 1") }
+executor.submit { println("Task 2") }
+executor.shutdown()
+
+//SingleThreadExecutor (Один поток)
+//Этот пул гарантирует выполнение задач в одном единственном потоке, то есть задачи будут выполняться поочередно.
+//Подходит, если нужно выполнить задачи последовательно и гарантировать их порядок.
+val executor = Executors.newSingleThreadExecutor()
+executor.submit { println("Task 1") }
+executor.submit { println("Task 2") }
+executor.shutdown()
+
+//ScheduledThreadPoolExecutor (Запланированные задачи)
+//Пул для выполнения задач с задержкой или периодичностью.
+//Полезен, если нужно выполнять задачи через определённые интервалы времени или с отложенным запуском.
+val executor = Executors.newScheduledThreadPool(2)
+executor.scheduleAtFixedRate({ println("Task 1") }, 0, 1, TimeUnit.SECONDS)
 
 
-Network request через executor service 
-
+//Network request через executor service 
 fun main() {
     // Создаем ExecutorService с 2 потоками
     val executor = Executors.newFixedThreadPool(2)
