@@ -40,4 +40,45 @@ fun main() {
     println("Поток завершил выполнение.")
 }
 
+
 //Daemon поток - поток, который работает в фоновом режиме, отличается от обычного потока, тем, что он не блокирует завершение программы. Если все обычные потоки (недемонные) завершили свою работу, JVM завершит работу и daemon-потоки.
+
+
+
+Network request через executor service 
+
+fun main() {
+    // Создаем ExecutorService с 2 потоками
+    val executor = Executors.newFixedThreadPool(2)
+
+    // Запускаем асинхронный сетевой запрос
+    executor.submit {
+        // Ваша задача: отправка HTTP-запроса
+        val result = makeNetworkRequest("https://jsonplaceholder.typicode.com/todos/1")
+        
+        // После завершения запроса, обработаем результат
+        println("Ответ от сервера: $result")
+    }
+
+    // Завершаем ExecutorService
+    executor.shutdown()
+    // Ждем завершения всех задач
+    executor.awaitTermination(1, TimeUnit.MINUTES)
+}
+
+// Функция для выполнения HTTP-запроса
+fun makeNetworkRequest(url: String): String {
+    // Создаем URL
+    val urlObj = URL(url)
+    val connection = urlObj.openConnection() as HttpURLConnection
+    connection.requestMethod = "GET"
+    
+    // Получаем ответ
+    val responseCode = connection.responseCode
+    return if (responseCode == HttpURLConnection.HTTP_OK) {
+        // Читаем данные из потока ответа
+        connection.inputStream.bufferedReader().use { it.readText() }
+    } else {
+        "Ошибка: $responseCode"
+    }
+}
